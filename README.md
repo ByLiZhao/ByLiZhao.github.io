@@ -1,4 +1,4 @@
-# John Z. Li's programming corner. 
+# John Z. Li's programming corner 
 
 * Sometimes, when I learn a thing or two about programming and I like to write it down, I also put it here in case I might forget in the future 
  (They are not meant to serve as tutorials for learning programming). 

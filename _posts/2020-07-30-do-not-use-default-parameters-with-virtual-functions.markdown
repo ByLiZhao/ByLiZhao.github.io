@@ -1,8 +1,12 @@
 ---
 layout: post
+mathjax: true
+comments: true
 title:  "Don't use default parameters with virtual functions"
+author: John Z. Li
 date:   2020-07-30 16:44:18 +0800
-categories: c++ pitfall
+categories: c++ programming
+tags: virtual-function default-parameter
 ---
 
 The below code will print the following:
@@ -34,3 +38,9 @@ int main() {
   return 0;
 }
 ```
+{% comment %}
+math formula can be input like below:
+{% raw %}
+  $$a^2 + b^2 = c^2$$ --> note that all equations between these tags will not need escaping! 
+{% endraw %}
+{% endcomment %}

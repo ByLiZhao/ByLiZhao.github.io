@@ -72,14 +72,14 @@ Before a line is completed in outputting,
 there are chances that the current thread is scheduled out and another thread
 kicks in and calling the operator `<<` to output in the same line.
 You fix the problem by adding a `lock_guard` into your `write_line()` function.
-And your friend tell you that C++20 introduced `std::osyncstream`,
+And your friend tells you that C++20 introduced `std::osyncstream`,
 so that you won’t have to manually handle synchronization in the future.
-That is great, but you still need your library work with earlier language standards.
+That is great, but you still need your library to work with earlier language standards.
 
 Finally, you get your `csv_writer` class done.
 It is a useful class, even your friend starts using it in his own projects.
-Problem is, your friend somehow find your default output format is ugly.
-He wants you modify your `csv_writer` class so that it becomes configurable.
+Problem is, your friend somehow finds your default output format is ugly.
+He wants you to modify your `csv_writer` class so that it becomes configurable.
 It is at this point, you find yourself completely helpless with `iostream`.
 You find you have to invent a mini language that can be used to specify
 how a sequence of values should be formatted.

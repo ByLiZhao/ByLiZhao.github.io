@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "Forcing memset to be executed-against-compiler-optimization"
+title:  "Forcing memset to be executed against compiler optimization"
 author: John Z. Li
 date:   2020-08-15 19:00:00 +0800
 categories: c programming

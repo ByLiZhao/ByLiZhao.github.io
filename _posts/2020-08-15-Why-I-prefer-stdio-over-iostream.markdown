@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "Why-I-prefer-stdio-over-iostream"
+title:  "Why I prefer stdio over iostream"
 author: John Z. Li
 date:   2020-08-15 19:00:00 +0800
 categories: c++ programming

@@ -96,4 +96,4 @@ otherwise, it will return a `nullptr`.
 
 *Notice that the same does not apply to references. If a reference of a base class is
 cast to a reference of a derived class, an exception will be thrown if the conversion
-can not be performed. *
+can not be performed.*

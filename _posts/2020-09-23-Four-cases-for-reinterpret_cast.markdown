@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "Four cases for reinterpret_cast"
+title:  "Four cases for `reinterpret_cast`"
 author: John Z. Li
 date:   2020-09-23 19:00:18 +0800
 categories: c++ programming

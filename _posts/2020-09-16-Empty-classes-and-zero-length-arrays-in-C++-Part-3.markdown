@@ -6,7 +6,7 @@ title:  "Empty classes and zero length arrays in C++: Part 3"
 author: John Z. Li
 date:   2020-09-16 19:00:18 +0800
 categories: c++ programming
-tags: empty-classes, zero-length-arrays
+tags: empty-classes, pass-key-idiom
 ---
 This post is about the Pass Key idiom using empty classes.
 

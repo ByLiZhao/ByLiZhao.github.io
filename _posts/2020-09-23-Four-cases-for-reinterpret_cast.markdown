@@ -6,8 +6,9 @@ title:  "Four cases for `reinterpret_cast`"
 author: John Z. Li
 date:   2020-09-23 19:00:18 +0800
 categories: c++ programming
-tags: type_cast, reinterpret_cast
+tags: type-cast, reinterpret_cast
 ---
+
 A previous blog post of mine [Type punning in C++](https://bylizhao.github.io/c++/programming/2020/08/01/type-punning-in-C++.html)
 mentioned that using `reinterpret_cast` to do type punning can easily leads to code that
 violates strict alias rule, thus undefined behavior, as the following code does
@@ -63,6 +64,7 @@ To check whether a string instance is a small string, one needs to perform somet
 to check and let `front()` refers to `reinterpret_cast<char*>(s)[1]` if it is.
 
 **Case 3**: cast to escape from nested structs, arrays or unions. For examples, with
+{% raw %}
 ```cpp
     struct A{int a;};
     struct B{
@@ -77,6 +79,7 @@ to check and let `front()` refers to `reinterpret_cast<char*>(s)[1]` if it is.
     int (& ints)[3] = reinterpret_cast<int(&)[3]>(c);
 	// to treat c as an array of three ints
 ```
+{% endraw %}
 object `c`, after compilation, boils down to three contiguous ints.
 So we can use `reinterpret_cast` to treat `c` as an array of int of length 3.
 This is useful when one works with complex numbers.

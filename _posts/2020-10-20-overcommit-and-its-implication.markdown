@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "overcommit-and-its-implication"
+title:  "overcommit and its implication"
 author: John Z. Li
 date:   2020-10-20 19:00:18 +0800
 categories:  programming

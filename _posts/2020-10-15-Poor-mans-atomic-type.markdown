@@ -4,7 +4,7 @@ mathjax: true
 comments: true
 title:  "Poor man's atomic type"
 author: John Z. Li
-date:   2020-10-03 19:00:18 +0800
+date:   2020-10-15 19:00:18 +0800
 categories: c programming
 tags: memory-order, atomic
 ---

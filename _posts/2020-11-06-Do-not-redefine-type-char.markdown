@@ -4,7 +4,7 @@ mathjax: true
 comments: true
 title:  "Do not redefine type char"
 author: John Z. Li
-date:   2020-11-01 19:00:18 +0800
+date:   2020-11-06 19:00:18 +0800
 categories: c programming
 tags: C, C++
 ---

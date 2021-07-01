@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "Some compiler options that disable UB-based behavior"
+title:  "Some compiler options that disable UB-based optimization"
 author: John Z. Li
 date:   2020-11-20 19:00:18 +0800
 categories: c++ programming

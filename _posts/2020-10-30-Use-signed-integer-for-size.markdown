@@ -4,7 +4,7 @@ mathjax: true
 comments: true
 title:  "Use signed integer for size"
 author: John Z. Li
-date:   2020-09-30 19:00:18 +0800
+date:   2020-10-30 19:00:18 +0800
 categories: c++ programming
 tags: sizeof, ssize
 ---

@@ -4,7 +4,7 @@ mathjax: true
 comments: true
 title:  "Working with ROS2 packages: Part 2 "
 author: John Z. Li
-date:   2021-02-11 19:00:18 +0800
+date:   2021-02-27 19:00:18 +0800
 categories: robotics
 tags: path-following
 ---

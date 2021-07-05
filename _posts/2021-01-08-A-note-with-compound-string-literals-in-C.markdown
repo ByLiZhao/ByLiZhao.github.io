@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "When static means at least in C"
+title:  "A note with compound string literals in C"
 author: John Z. Li
 date:   2021-01-08 19:00:18 +0800
 categories: c programming

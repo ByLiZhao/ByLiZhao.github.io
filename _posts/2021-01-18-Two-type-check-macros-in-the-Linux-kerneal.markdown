@@ -33,7 +33,7 @@ only containing two macros, which are straightforward:
     	(void)__tmp; \
     })
 ```
-{% raw %}
+{% endraw %}
 As the comments say, the two macros are intended to check if
 a variable or function is of the desired types,
 both being dependent on GCC's `typeof` extension.

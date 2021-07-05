@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "The ARRAY_SIZE macro defined in the Linux kernel"
+title:  "Two type check macros in the Linux kernel"
 author: John Z. Li
 date:   2021-01-18 19:00:18 +0800
 categories: c programming

@@ -9,6 +9,7 @@ categories: c++ programming
 tags: type-deduction, auto
 ---
 Consider the following code snippet:
+{% raw %}
 ```cpp
     auto get_colored_text() {
       struct Red_text {
@@ -19,6 +20,7 @@ Consider the following code snippet:
       return red_text;
     }
 ```
+{% endraw %}
 The function `get_colored_text()` returns an object of the type that
 is defined inside the function.
 Without `auto`, this function can not be defined.

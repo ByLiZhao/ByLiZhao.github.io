@@ -11,8 +11,8 @@ tags: type_check
 There are two macros for type checking in the Linux kernel.
 The header "typecheck.h" (in "include/linux") is quite short,
 only containing two macros, which are straightforward:
+{% highlight c%}
 {% raw %}
-```c
     /*
      * Check at compile time that something is of a particular type.
      * Always evaluates to 1 so you may use it easily in comparisons.
@@ -32,8 +32,9 @@ only containing two macros, which are straightforward:
     ({	typeof(type) __tmp = function; \
     	(void)__tmp; \
     })
-```
 {% endraw %}
+{% endhighlight %}
+
 As the comments say, the two macros are intended to check if
 a variable or function is of the desired types,
 both being dependent on GCC's `typeof` extension.

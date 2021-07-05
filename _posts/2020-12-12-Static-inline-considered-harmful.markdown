@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "An assert replacement for embedded programming"
+title:  "Static inline considered harmful"
 author: John Z. Li
 date:   2020-12-12 19:00:18 +0800
 categories: c programming

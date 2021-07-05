@@ -11,4 +11,4 @@ tags: path-following
 My review of the two path following controllers: the Rear Wheel Controller and
 The Stanley Controller. Both are locally exponentially convergent.
 These two controllers can be used as the baseline candidates of path following algorithms.
-See the document ![here](/assets/pdf/path_following_controller.pdf).
+See the document [here](/assets/pdf/path_following_controller.pdf).

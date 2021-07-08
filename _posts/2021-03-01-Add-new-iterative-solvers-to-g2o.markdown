@@ -4,7 +4,7 @@ mathjax: true
 comments: true
 title:  "Add new iterative solvers to g2o"
 author: John Z. Li
-date:   2021-02-27 19:00:18 +0800
+date:   2021-03-01 19:00:18 +0800
 categories: robotics
 tags: graph-optimization
 ---

@@ -4,7 +4,7 @@ mathjax: true
 comments: true
 title:  "Two path following controllers: a review"
 author: John Z. Li
-date:   2021-02-11 19:00:18 +0800
+date:   2021-02-17 19:00:18 +0800
 categories: robotics
 tags: path-following
 ---

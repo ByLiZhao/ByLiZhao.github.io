@@ -4,9 +4,9 @@ mathjax: true
 comments: true
 title:  "Recurrent minor issues in C++ code"
 author: John Z. Li
-date:   2021-03-10 19:00:18 +0800
-categories: robotics
-tags: ROS, Navigation2
+date:   2021-03-17 19:00:18 +0800
+categories: c++
+tags: constexpr, auto, inline, lowest, to_string
 ---
 While reading real-world C++ code in some open-source projects, I noticed the following
 minor issues appearing again and again:

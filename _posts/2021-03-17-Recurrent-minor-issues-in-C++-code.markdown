@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "Recurrent minor C++ issues in code"
+title:  "Recurrent minor issues in C++ code"
 author: John Z. Li
 date:   2021-03-10 19:00:18 +0800
 categories: robotics

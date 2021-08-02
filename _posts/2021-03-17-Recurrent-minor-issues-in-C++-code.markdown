@@ -22,7 +22,7 @@ auto assistant_wheel_index = 0;
         assistant_wheel_[assistant_wheel_index].AddTask(task);
       }
 ```
-The variable `assistant_wheel_index` is induced as `int`, but the programmer actually wants
+The variable `assistant_wheel_index` is deduced as `int`, but the programmer actually wants
 an `uint64_t`.  The compiler would complain that a value of `uint64_t` is assigned to
 an `int`, thus might potentially leads to incorrect results. If we change the first line
 of the code snippet to

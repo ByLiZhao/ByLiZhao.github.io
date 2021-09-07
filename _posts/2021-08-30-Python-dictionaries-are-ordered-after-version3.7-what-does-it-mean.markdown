@@ -53,16 +53,16 @@ by adding another layer of indirection: The "values" in key-value pairs are now 
 and the indices of those "values" are referenced in the hash table, like below
 
 
-|Value index   |
-| ------------ |
-| 2            |
-| ...          |
-| 3            |
-| ...          |
-| 1            |
-| ...          |
-| 0            |
-with a corresponding dense vector as
+|index in sparse array | comment                          |
+| -------------------- | -------------------------------- |
+| 2                    | refers to vec[2]                 |
+| ...                  | filled with "None"               |
+| 3                    | refers to vec[3]                 |
+| ...                  | filled with "None"               |
+| 1                    | refers to vec[1]                 |
+| ...                  | filled with "None"               |
+| 0                    | refers to vec[0]
+with a corresponding dense vector, aka `vec` as
 ```python
 [[hash('John'),   'John',   "Engineer", ],
  [hash('Keith'),  'Keith',  "Manager", ],
@@ -74,9 +74,9 @@ The advantages of the new implementation are three-fold:
 
 1. First, iterating over a dense vector is much faster than iterating a sparse array.
 It only involves increment a pointer by a fixed step size.
-2. Since the sparse array now only needs to store indices, which are integer numbers,
+2. Second, since the sparse array now only needs to store indices, which are integer numbers,
 it will consume less memory.
-3. Most of time, dictionaries are inquired for the existence of a key-value pair, or
+3. Thirdly, most of time, dictionaries are inquired for the existence of a key-value pair, or
 new key-value pairs are added. Removing key-values pairs happens less frequently.
 A typical implementation of dense vectors is capable of handling vector length growth
 quite well. A good implementation should also make it possible that a vector grows in-place

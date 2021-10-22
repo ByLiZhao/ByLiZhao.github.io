@@ -22,7 +22,6 @@ following:
 ros2 pkg create --build-type ament_cmake <package_name>
 # Python project
 ros2 pkg create --build-type ament_python <package_name>
-
 ## Or use the --node-name option to specify the entry point of the package, that is
 ## the package provides an executable named after "node_name"
 ros2 pkg create --build-type ament_cmake --node-name <node_name> <package_name>

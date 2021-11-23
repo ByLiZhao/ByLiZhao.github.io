@@ -5,7 +5,7 @@ comments: true
 title:  "Python dictionaries are ordered after version 3.7, what does it mean"
 author: John Z. Li
 date:   2021-08-30 19:00:18 +0800
-categories: c++
+categories: python
 tags: python, dictionary
 ---
 Someone asked on stackoverflow that [whether dictionaries are ordered in Python 3.6+](https://stackoverflow.com/questions/39980323/are-dictionaries-ordered-in-python-3-6).

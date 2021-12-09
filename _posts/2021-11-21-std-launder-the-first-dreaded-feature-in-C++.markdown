@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "std::launder, the most dreaded feature in C++"
+title:  "std::launder, the most dreaded feature in C++?"
 author: John Z. Li
 date:   2021-11-21 21:00:18 +0800
 categories: c++

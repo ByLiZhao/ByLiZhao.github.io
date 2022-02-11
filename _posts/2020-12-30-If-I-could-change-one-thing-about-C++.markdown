@@ -74,8 +74,8 @@ the programmer can add a overloading `void fun(const T&)`, resulting something l
 ```cpp
     class T{
         public:
-        void fun(T t){} //handle the case of T&& and const T&&
-        void fun(const T&){}; //handle the case of T& and const T&
+        void fun(T t){} //handle  rvalues
+        void fun(const T&){}; //handle lvalues
     };
 ```
 Now if argument passed in is an lvalue, `fun(const T&)`

@@ -62,7 +62,8 @@ S s;
 auto i = (s.*f)(2);
 ```
 This is kind of beating the purpose of creating alias for functions. Instead of making code clearer, it fills code with syntax noises.
-For non-static member functions, we can use `std::mem_fun` instead. An object of `std::mem_fn` is just a wrapper over a member function pointer,
+For non-static member functions, we can use `std::mem_fn` instead. (There is also `std::mem_fun` which has been deprecated since C++17.)
+)An object of `std::mem_fn` is just a wrapper over a member function pointer,
 but with better syntax. For example:
 ```cpp
 struct S {

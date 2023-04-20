@@ -88,7 +88,7 @@ this also means the Producer thread can start to put new `MsgB` in another slot.
 |Producer Thread|--flip(true)    [MsgA]
                            \           \
                             \           \
-							[MsgB]       \--flop(false)--|Consumer Thread|
+                            [MsgB]       \--flop(false)--|Consumer Thread|
 ```
 Step four: After the consumer thread finishes consuming MsgA, it alters `flop`
 to `true` again. And after putting `MsgB` into the second slot, the producer

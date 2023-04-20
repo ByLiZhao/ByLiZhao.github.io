@@ -79,16 +79,16 @@ Step one: the intial state, the buffer is empty.
 Step two: Producer thread put a message in the buffer, and alter `flip` to `true`.
 ```txt
 |Producer Thread|--flip(true)  [MsgA]
-							\
-							 \ [Null]--flop(true)--[Consumer Thread|
+                            \
+                             \ [Null]--flop(true)--[Consumer Thread|
 ```
 Step three: the cosumer thread starts to consume `MsgA` after alter `flop` to false.
 this also means the Producer thread can start to put new `MsgB` in another slot.
 ```txt
 |Producer Thread|--flip(true)    [MsgA]
-						   \           \
-						    \           \
-							[MsgB] 		 \--flop(false)--|Consumer Thread|
+                           \           \
+                            \           \
+							[MsgB]       \--flop(false)--|Consumer Thread|
 ```
 Step four: After the consumer thread finishes consuming MsgA, it alters `flop`
 to `true` again. And after putting `MsgB` into the second slot, the producer

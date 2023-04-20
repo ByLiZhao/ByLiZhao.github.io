@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "Conversion operator considered harmful"
+title:  "Conversion operators considered harmful"
 author: John Z. Li
 date:   2023-04-20 21:00:18 +0800
 categories: C++

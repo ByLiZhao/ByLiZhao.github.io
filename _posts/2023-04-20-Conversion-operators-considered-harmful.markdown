@@ -9,7 +9,7 @@ categories: C++
 tags: conversion_operator, conversion_constructor, overloading_resolution
 ---
 There are two ways to define a implicit conversion sequence in C++. (many people
-argue that the whole idea of implicit conversion in a programming langauge is bac.
+argue that the whole idea of implicit conversion in a programming langauge is bad.
 Let us put this aside for this post.) One is via a so called conversion operator.
 In any class `A`, if you define an operator in the form of `operator B()` or
 `operator B() const`, where `B` is a type, it defines an implicit conversion

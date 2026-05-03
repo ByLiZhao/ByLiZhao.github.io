@@ -354,6 +354,7 @@ Otherwise, the left operand is treated as a `String`.
 
 When broadcasting operator is applied to s `List`,
 each element of the `List` has the operand actioned on.
+{% raw %}
 ```txt
 session = {Jane_street, Cube}#_session
 // is equivalent to session = {Jane_street_session, Cube_session}
@@ -361,13 +362,16 @@ session = {Jane_street, Cube}#1:3
 // is equivalent to
 session = {{Jane_street1, Jane_street2}, { Cube1, Cube2}}
 ```
+{% endraw %}
 
 The broadcasting operator can be combined together to make more complicated examples
+{% raw %}
 ```txt
 session = {Jane_street, Cube}#_session_#1:3
 // is equivalent to
 session = {{Jane_street_session_1, Jane_street_session_2}, {Cube_session_1, Cube_session_2}}
 ```
+{% endraw %}
 
 ## set and map
 We use `[namae]` to introduce a set. Which is also known as enumerations, or a universe.

@@ -13,8 +13,12 @@ that is, the `settimeout` member function. `my_socket.settimeout(None)` sets
 `my_socket` to blocking mode, and `my_socket.settimeout(0.0)` sets `my_socket`
 to non-blocking mode. (They are equivalent to calling `my_socket.setblocking(True)`
 and `my_socket.setblocking(False)`, respectively.) When `settimeout` is called
-with a paramter of positive normal floating pointer number, the socket is set to
-blocking mode with the specified timeout in seconds.
+with a paramter of positive normal floating pointer number, the underlying socket fd
+is set to non-blocking mode, yet the Python socket object is set to
+blocking mode. Actually, the `getblocking()` member function is equivalent with
+checking whether whether the socket object has a positive timeout.
+In other words, the non-blockness of the underlying fd and that of the Python socket
+object are not the same.
 
 If you are a programmer who are farmilar with Linux's TCP stack, it is tempting
 to think that the timeout mechanism of Python's socket library is implemented via
@@ -42,25 +46,25 @@ is important.
 Back to Python's `socket` in its standard library, it is tempting to assume that
 `settimeout()` works in a similar fansion. But that is **not** what happens. Users
 of Python are sometimes caught off guard if they hold the wrong assumption.
-For example, if the `timeout` of a blocking socket is set to `5` seconds, is it
+For example, if the `timeout` of a Python socket is set to `5` seconds, is it
 guaranteed that the `send` function call will retuan within `5` seconds? The answer
-is NO. The reason is that in each `send` or `recv` call on sockets, a `select` is
-first called with the specified timeout. If the corresponding `send` or `recv` can
-be performed after the `select` call, it move forward to actually send or receive
-data from the socket. But for blocking sockets, once the sending or receiving starts,
-unless there is an error, the system call will only return after all data is sent
-for `send`, or either all available data is received given a big enough receiving
-buffer.
+is NO. The reason is that in each `send` or `recv` call on sockets, a `select` (implemented in terms of `poll` on Linux)
+is first called with the specified timeout (this timeout is recalculated in each iteration of the loop).
+If the corresponding `send` or `recv` can be performed after the `select` call, it move forward to actually send or receive
+data from the socket. But once the sending or receiving starts,
+the timeout setting is not effective. The system call might take an unexpected long time.
 
 We can see that the design of Python's `socket` module emphasize on ease of use
 at the cost of some performance loss. This means even you use `epoll` to wiat on
 I/O events on sockets, at the time of actually calling `send` or `recv`, there is
-always the overhead of calling `select`. This is obviously suboptimal in terms of
-performance. The bright side of this design is that it makes writing simple message
-exchange applications easy. This means, for blocking sockets, the `send` function
-is a **All or nothing** interface, as well as the `recv` function given a big
-enough receiving buffer. With this design, the users usually do not have to worry
-about message fragmentation at the socket level.
+always the overhead of calling `select` to check whether the socket is writable or readable.
+This is obviously suboptimal in terms of performance.
+The bright side of this design is that it makes writing simple message
+exchange applications easy. This means, for blocking mode Python sockets with a positive timeout,
+the `send` function is basically a **All or nothing** interface, as well as the `recv` function given a big
+enough receiving buffer, assuming that the other side is not acting too weird.
+With this design, the users usually do not have to worry about message fragmentation given a reasonable timeout.
+Beyond that, we can always close the socket.
 
 This design align well with the overall design goals of Python, that is ease of use.
 Some other Python network related libraties inherit the same design principles of

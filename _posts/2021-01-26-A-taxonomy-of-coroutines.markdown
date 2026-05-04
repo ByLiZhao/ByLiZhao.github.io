@@ -33,15 +33,16 @@ If coroutines in a programming language are always supposed to
 use with/within some specific language constructs.
 Iterators and generators in many programming languages
 are examples of constrained coroutines.
-Usually, they are only supposed to loop over or traverse a
-collection of data objects.
-They are used to abstract away concrete representations of
-these collection and provide programmers with a
+Usually, they are only supposed to be used to traverse a
+collection of data objects, or to lazily generate a series of objects.
+Take iterators as an example,
+they are used to abstract away from concrete implementation of
+these collections and provide programmers with a
 unified interface to traverse collections without
 bothering their underlying implementations.
 
 OTOH, If coroutines are first-class citizens of a programming language.
-It means, the programmer can use it anywhere as he wants,
+It means, the programmer can use it anywhere he wants,
 This often means, the programmer can compose coroutines freely
 with other language features to explore the full power of expressivity of coroutines.
 

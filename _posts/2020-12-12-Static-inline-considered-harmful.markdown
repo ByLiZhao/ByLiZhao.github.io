@@ -42,18 +42,14 @@ However, if they are marked as `static inline` instead, we have problems:
 - First, the `static` keyword nullifies the semantic meaning of the `inline` keyword.
 A function is marked with `static inline` are just static functions,
 which means, whether it gets inlined,
-each translation unit including the definition of the function gets a binary bloat.
+each translation unit keeps a copy of the function leadingto binary bloat.
 - More importantly, there are no guarantee that each copy of the function
 in different translation units is identical with each other.
-It is possible that some macro definitions or some `static const` variables
+It is possible that some macro definitions or some function scope or file scope `static` variables
 have made the same inline function in different translation units behave differently.
 But the programmer may be left with the false assumption that they are identical.
 Imagine that you have to debug a program that is broken because the
 identical requirements are silently violated.
-- Since the function is marked static,
-no symbol will be exported in the binary.
-External users of the binary are deprived of the option
-to use the function as a normal function.
 
 To sum up, do not mark your function as `static inline`.
 If you mean static, use static. If you mean inline, use it properly.

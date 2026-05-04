@@ -10,7 +10,7 @@ tags: inline, ODR
 ---
 One guideline of the C++ language design is that macros should be used
 as less as possible.
-With C, if one wants to define a compile constant, he may do it by
+With C, if one wants to define a compile-time constant, he may do it by
 ```c
     #define pi (3.141592653589793238462643383279502884)
 ```
@@ -35,7 +35,8 @@ and define pi in a separate C file
         const double pi = 3.141592653589793238462643383279502884;
 ```
 This solves the problem of violating ODR, but has the unpleasant effect that even if
-`pi` is a compile time constant, its definition is in another compilation unit which is only accessed during link time.
+`pi` is a compile time constant, its definition is in another compilation unit which is only known during link time.
+This excludes some very useful compiler optimization opportunities, such constant propagation.
 
 C++ solves this particular problem by decreeing that a `const`
 variable in the global scope has internal linkage.
@@ -61,7 +62,7 @@ and the intention is that the constructor shall be only executed once.
 twice along with all its side effects, and the order of execution is unspecified.)
 
 If we really think about it, it is obvious that C++ has solved the wrong problem.
-The real problem that needs to be solved is that the programmer wants a way to express his intention like
+The real problem is that the programmer wants a way to express his intention like
 
 >    Hi, compiler, don't mind ODR for this object.
 
@@ -99,7 +100,7 @@ you have to define it in a separate cpp file while other parts of the class is i
 With C++17, we can just go with
 ```cpp
     class X{
-        inline static int count = 0;
+        inline static SomeType object{};
     };
 ```
 Curiously enough, the same problem didn't happen for

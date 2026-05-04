@@ -2,7 +2,7 @@
 layout: post
 mathjax: true
 comments: true
-title:  "Const lvalue reference is useless"
+title:  "Const rvalue reference is useless"
 author: John Z. Li
 date:   2020-12-16 19:00:18 +0800
 categories: c++ programming

@@ -9,8 +9,8 @@ categories: c++
 tags: c++, boost, split, tokenize
 ---
 Several days ago, I was bitten by this weird behavior of `boost::split`: if the
-input string is empty, it puts an empty string into the output vector with the
-following code.
+input string is empty, it puts an empty string into the output vector.
+With the following code, the result vector is not empty but contains an empty string.
 ```cpp
     std::vector<std::string> result;
     boost::split(result, "", boost::is_any_of(","), boost::algorithm::token_compress_on);
@@ -18,8 +18,9 @@ following code.
 ```
 This is really bad because it violates the Null-to-Null correspondence, which is
 a term coined by me to express the idea that for algorithms like `split`, the expected
-behavior by most programmers, I believe, should always be mapping an set to an empty
-set. Ironically, the boost documentation falsely claims that "This function is equivalent to C strtok",
+behavior by most programmers, I believe, should always be mapping an empty string to an empty set.
+Splitting nothing is intuitively a Non-op, resulting nothing, an empty vector in this case.
+Ironically, the boost documentation falsely claims that "This function is equivalent to C strtok",
 but `strtok` does not have this problem.
 
 If one looks more closely, `boost::split` is actually broken in more than one way.

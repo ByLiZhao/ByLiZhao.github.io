@@ -110,8 +110,8 @@ and they have the same signature) but behaves like the object is copied into the
     v.push_back(std::move(obj)); //call push_back(value_type val)
 ```
 rvalue reference can thus be saved for more esoteric cases,
-like perfect forwarding, or when the move constructor
-of the object can throw (throwing move constructors are rare though).
+like perfect forwarding in template programming, or when the move constructor
+of the object can throw (throwing move constructors are rare though) and one wants to catch the exception inside the function body.
 In those rare cases, one can always add another overloaded member function with the signature
 ```cpp
     void fun(T&&); //if the move constructor of T can throw and

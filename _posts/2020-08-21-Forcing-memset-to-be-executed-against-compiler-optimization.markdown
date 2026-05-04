@@ -14,22 +14,22 @@ With following code
 ```c
     char a[10];
     scanf("%9s", a);
-    printf("%s\n", a); // changed to puts by the compilers
+    printf("%s\n", a); // compiled to calling "puts" by the compilers
     memset(a, 0, sizeof a); // REMOVED by the compilers
 ```
 if turning on compiler optimization with `-O2`,
 It is very likely that the `memset` function call will be removed.
 
-I believe this is due to an optimization technique called
-dead code removal.
+This is due to an compiler optimization called dead code removal.
 If a compiler sees that the char array is not going to be used in following code
-(like to be written in, be printed to the screen, or be sent via socket),
-it feels that the `memset` function call is unnecessary, thus making removes it from
-the compiled object file.
-If the vector array is reused for other purposes, and the compiler again can prove
-that its content is overwritten, the compiler might also conclude that the `memset`
+(like being written in, or being printed to the screen, or being sent via socket, etc.),
+it deduces that the `memset` function call is unnecessary, thus removes it from
+generated object file.
+
+If the char array is reused in following code for other purposes, but the compiler again can prove
+that its content will soon be overwritten, the compiler might also conclude that the `memset`
 is unnecessary, for if the content of the array will be overwritten anyway, whey bother
-firstly zeroing all its elements, thus again optimize away the `memset`.
+firstly `memset`ing its elements to zeros, only to be overwritten next.
 
 Problem is, this optimization is sometimes not what a programmer would expect.
 For example, if the `memset`
@@ -50,7 +50,7 @@ we can define the following `memset` replacement:
 ```
 
 Because the function `memset_s` takes a pointer to `volatile char`
-as its first parameter, writing to the pointed char cannot be optimized away.
+as its first parameter, writing to the pointed char array cannot be optimized away.
 
 Actually, C11 introduced a function `memset_s` with the signature
 ```c

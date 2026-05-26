@@ -4,7 +4,7 @@ mathjax: true
 comments: true
 title:  "Two dimensional hash tables for low latency trading systems"
 author: John Z. Li
-date:   2025-07-07 10:00:00 +0800
+date:   2025-08-07 10:00:00 +0800
 categories: programming
 tags: trading, low-latency, software
 ---

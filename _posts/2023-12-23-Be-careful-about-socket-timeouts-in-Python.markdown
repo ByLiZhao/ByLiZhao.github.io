@@ -98,6 +98,7 @@ file has been received. The documentation of `requests` is explicit about this, 
 > rather, an exception is raised if the server has not issued a response
 > for timeout seconds (more precisely, if no bytes have been received on
 > the underlying socket for timeout seconds).
+
 In extreme cases, for example, if a remote server sends 1 bytes per second, `session.get` is totally
 fine with it and will never trigger a timeout exception.
 In a sense, this is also a **All or nothing** interface.

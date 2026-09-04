@@ -42,9 +42,14 @@ there is one thing that the language does provide, that is:
 So whenever one sees some code like
 ```cpp
 A a; // A is a class
-
+// if the compiler can prove a will be not used after, it will move a to fun
 fun(a);
-fun(g()); //g() returns an object of type A
+// g() returns an object of type A,
+// compipler will construct an object of type A directly inside fun
+// not even a move is needed.
+// Inside function g, Return Value Optimization will happen,
+// below code does not even trigger a single copy or move
+fun(g());
 ```
 he knows that semantically, a copy  is required.
 

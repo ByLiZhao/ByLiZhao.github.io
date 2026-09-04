@@ -31,18 +31,20 @@ With this in mind, there are four things that one might want to do with an objec
 
 When an object is passed into a function, a question can be asked:
 > What purpose does the parameter passing is supposed to serve?
+
 This morale of this question is not about performance or optimization,
 but about programmers’ intention and semantics.
 While there is no language features that help programmers
 to explicitly make distinctions between the above mentioned four cases,
 there is one thing that the language does provide, that is:
 > Passing by value means to copy (case 3 or 4).
+
 So whenever one sees some code like
 ```cpp
-class_name a;
+A a; // A is a class
 
 fun(a);
-fun(g()); //g() returns an object of type class_name
+fun(g()); //g() returns an object of type A
 ```
 he knows that semantically, a copy  is required.
 
@@ -66,7 +68,7 @@ we can save pass by constant reference for something that
 bears more semantic meaning,
 that the parameter is read-only (case 1). So that whenever ones sees some code like this
 ```cpp
-    fun(const class_name & a, …);
+    fun(const A& a, …);
 ```
 he know that `fun()` or functions called by `fun()` won’t make copies of `a`,
 nor write to a (no `const_cast` or other black magic will be performed).
@@ -76,11 +78,11 @@ better express programmers' intentions.**
 As to Case 2, we could let passing by reference bears the extra semantic meaning
 that one would not explicitly take its address inside the function, for example, when one sees code like
 ```cpp
-    fun(class_name & a, ...)
+    fun(A & a, ...)
 ```
 we know that there is no code like below in `fun` or functions  called by `fun`,
 ```cpp
-    class_name * p = &a;
+    A * p = &a;
     p++;
 ```
 And the only way to access to `a` is through `a` or an

@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-# John Z. Li's programming corner
+# Programming in the small
 
 This is my personal Github pages site. I use it as a technical blogging platform.
 All posts are about programming or things that are programming related:
@@ -17,7 +17,7 @@ All posts are about programming or things that are programming related:
 * Sometimes, when I feel an urge to rant about a programming language, a programming tool,
  or anything related with programming,
  I tend to write down what I have in mind at the time.
- Posts of this type are  just my personal opinions, and subject to my own biases.
+ Posts of this type are just my personal opinions, and subject to my own biases.
 
 * Sometimes, I talk about programming problems arising in certain scientific/engineering domains,
   possibly numerical methods, computer aided control system design or robotics.

@@ -58,7 +58,7 @@ enough to know that the piece of memory that contains `0` is still alive because
 it is reachable from the living root `my_int_alias`. So, problem solved?
 
 However, if we look at the problem more closely, we find out that with the C# version,
-`my_int_alis` points to valid memory but the wrong object or the value of that object.
+`my_int_alias` points to valid memory but the wrong object or the value of that object.
 **Indeed, valid memory only means that the program does not access memory it should not touch,
 it says nothing about whether the program has right logic. Memory security could be just
 a symptom of logic error.**
@@ -74,5 +74,5 @@ That is an "use-after-free" bug as before.
 
 With a language with garbage collection, **the code is still incorrect, but the problem is concealed by
 the garbage collector.** It is very possible that you are accessing the wrong object without noticing it.
-The garbage collector keeps the object alive, but it is only that. It takes more effort to right
+The garbage collector keeps the object alive, but it is only that. It takes more effort to correct
 correct code than memory-security code.

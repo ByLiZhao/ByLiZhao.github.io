@@ -17,7 +17,7 @@ with a paramter of positive normal floating pointer number, the underlying socke
 is set to non-blocking mode, yet the Python socket object is set to
 blocking mode. Actually, the `getblocking()` member function is equivalent with
 checking whether the socket object has `timeout != 0`.
-A positive timeout does equal to `0`, such `getblocking()` will return `False`.
+A positive timeout does not equal to `0`, thus `getblocking()` will return `True`.
 In other words, the non-blockness of the underlying fd and that of the Python socket
 object are not the same.
 
@@ -45,7 +45,7 @@ of data being written or read can not freeze the whole application, which someti
 is important.
 
 Back to Python's `socket` in its standard library, it is tempting to assume that
-`settimeout()` works in a similar fansion. But that is **not** what happens. Users
+`settimeout()` works in a similar fashion. But that is **not** what happens. Users
 of Python are sometimes caught off guard if they hold wrong assumptions.
 For example, if the `timeout` of a Python socket is set to `5` seconds, is it
 guaranteed that the `send` function call will return within `5` seconds? The answer
@@ -61,7 +61,7 @@ does not seem bad, actually sufficient in many cases, but one should keep in min
 that the OS-level `send` and `recv` do not know about the timeout you set inside a Python `socket` object.
 
 We can see that the design of Python's `socket` module emphasizes on ease of use
-at the cost of some performance loss. Once a positive timeout is set, you always pay the price of the overhead
+at the cost of precise control. Once a positive timeout is set, you always pay the price of the overhead
 of calling `select` to check whether the socket is writable or readable before actually writing or reading.
 This is obviously suboptimal in terms of performance.
 Writing and reading is non-symmetric.

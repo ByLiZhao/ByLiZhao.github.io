@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: John Z. Li's Programming Corner 
+title: Programming In The Small
 email: lizhao.johnlee@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
         When I learn a thing or two about programming and I feel like writing it down,

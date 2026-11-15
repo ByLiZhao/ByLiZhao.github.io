@@ -158,7 +158,8 @@ For simple cases:
   grow and shrink like `std::deque`. Usually, you have a good estimation of the size of data set of your application. Setting a big enough capacity at queue
   construction will suffice in most cases.
 - if you really need to push and pop on both ends, consider `std::list` first. If performance is confirmed an issue after measurement, consider `std::pmr::list`.
-  If even `std::pmr::list` not fast enough for you, consider using custom allocators with `std::list`.
+  If even `std::pmr::list` not fast enough for you, consider using custom allocators with `std::list`. Performance-wise, the biggest concern for `std::list` is
+  usually poor cache locality and repetitive memory allocation/deallocation. Custom allocators can greatly reduce the cost.
 
 ## Go one step further
 If you application is really performance critical, and circular buffers are too restrictive and `std::list` is too slow even with custom allocators,

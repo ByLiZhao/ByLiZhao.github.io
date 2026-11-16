@@ -121,14 +121,17 @@ All of these are nice at first glance, but not so much under closer inspection.
 
 In C++, with modern malloc implementations such as `jemalloc` or `tcmalloc`,
 each thread often has its own per-thread memory pool or arena. Allocation of a small
-pieces of memory can often be satisfied very fast without contending on a global lock.
-Large allocations, likely requires coordination with global malloc state or the OS.
-The latter can be 10 times or 100 times slower than the former.
-This means, with certain use pattern, `std::deque` can even be slower than `std::list`.
-Yes, `std::list` will trigger more allocations and deallocations, but modern malloc implementations
+pieces of memory can often be satisfied very fast.
+This is not to say that allocating `512` bytes would be slower than allocating `double` 64 times.
+Usually the former would be still faster.
+The point the author want to highlight here is that
+although  `std::list` triggers more allocations and deallocations, but modern malloc implementations
 are very good at handling frequent small memory operations. In a sense, they are already doing
-small objects pooling for you but transparently. So, instead of "I am going to use `std::deque` because it is fast",
+small objects pooling for you but transparently.
+So, instead of "I am going to use `std::deque` because it is fast",
 measure before making a decision. The numbers might surprise you.
+If `std::list` is already fast enough for you, even if it is still slightly slower,
+you may still choose it because you prefer iterator stability.
 
 Even if the standard allocator is not enough,
 C++ already has a way to optimize memory allocation for C++ containers, that is, allocators.
@@ -138,28 +141,39 @@ making it virtually impossible to use custom allocators with it.
 An allocator for `std::deque` must handle 2 types of memory allocation,
 one for the allocation of the internal pointer array,
 and one for the allocation of fix-sized chunks, the size of which is an implementation detail that is not exposed to users.
-If you want to make an optimized allocator for `std::deque`, you need to know what is chunk size used  in GCC's `libstdc++`,
-The size will be different for Clang's implementation of `std::deque`, which uses a chunk size of `4096` bytes.
-Even if you are able to implement a custom allocator for `std::deque` with some clever tricks,
-will it be faster than, say, `std::list` with custom allocators?
+If you want to make an optimized allocator for `std::deque`, you need to know what chunk size is used.
+The size used in GCC's `libstdc++`  is different than that of Clang's `libc++`,  which uses a chunk size of `4096` bytes.
+Your implementation of  a custom allocator for `std::deque` should not depends on an internal detail of it which
+is intentionally hidden from you.
 
 The argument here is not that you should use `std::list`, but that you could.
-Actually, if you need a first-in-first-out queue, you probably should consider a ring buffer (also called circular buffers) first.
+Actually, if you know your data size, you should consider a ring buffer (also called circular buffers) first.
 Modern implementations of ring buffers often support capacity grow. It is only that users need to explicitly trigger reallocation.
 For example, you can use `set_capacity` to grow capacity of a `boost::circular_buffer`.
 If you need to push one million double numbers into a `boost::circular_buffer`, you can set its capacity to be big enough to hold
 all of them. This will trigger a one-time memory allocation. While with `std::deque`, it will trigger at least ` 1 million / 64 = 15625` memory allocations.
 `std::deque` does not expose a `reserve` API to users. Even if you know in advance how many elements you are going to push into a queue,
 there is no way you can let `std::deque` to preserve memory and stop eager deallocation.
+And when you pop out all the one million elements, `std::deque` will trigger at least `15625 - 1` (minus 1 for the keeping one chunk alive trick)
+deallocations. With certain usage pattern and workload, the performance of `std::deque` can be disappointing.
 
 For simple cases:
-- If you only need a first-in-first-out queue, consider circular buffers. Elements are stored in contiguous memory, which makes it fast and random accessible.
+- First consider circular buffers. Elements are stored in contiguous memory (or in 2 pieces of contiguous memory), which makes it fast and random accessible.
   Better, push and pop don't invalidate iterators. Growing capacity will invalidate iterators, but that is under your control. Moreover, it does not frequently
   grow and shrink like `std::deque`. Usually, you have a good estimation of the size of data set of your application. Setting a big enough capacity at queue
-  construction will suffice in most cases.
-- if you really need to push and pop on both ends, consider `std::list` first. If performance is confirmed an issue after measurement, consider `std::pmr::list`.
-  If even `std::pmr::list` not fast enough for you, consider using custom allocators with `std::list`. Performance-wise, the biggest concern for `std::list` is
+  construction will suffice in most simple cases.
+- If it is really hard to predict an upper bound for queue size in your application,
+  and queues in your application can grow indefinitely,
+  consider `std::list` (or `std::forward_list` for queue semantics) first. If performance is confirmed an issue after measurement, consider `std::pmr::list`.
+  If even `std::pmr::list` not fast enough for you, consider using custom allocators with `std::list`.
+  Performance-wise, the biggest concern for `std::list` is
   usually poor cache locality and repetitive memory allocation/deallocation. Custom allocators can greatly reduce the cost.
+  Yes, even with custom allocators, `std::list` would usually still be slower when elements are processed sequentially because of point chasing,
+  but the performance difference can be within a small margin.
+  Having large queues is usually a strong indicator that you might need to perform some kind of filters on queue elements in future.
+  `std::list`'s ability to insert and erase elements in the middle of queue would become handy in this situation.
+  So, the argument here is not "use `std::list` because it is faster than `std::deque`, but "consider `std::list` because
+  its performance is not as bad as you might think while it enables more flexible design and logic".
 
 ## Go one step further
 If you application is really performance critical, and circular buffers are too restrictive and `std::list` is too slow even with custom allocators,
@@ -168,6 +182,7 @@ we can go one step further to pursue a radical design.
 Let us start with queues. We can make a queue by wrapping a `std::vector<std::optional>` like below.
 The code sample is only to illustrate the idea, and intentionally incomplete.
 Too much code would hide the core idea in implementation details.
+Note it is for queue semantics, so it should be compared with `std::queue` instead of `std::deque`.
 ```cpp
 template<typename T>
 class queue {
@@ -229,16 +244,20 @@ With this design, the queue has the following properties trivially:
 
 The only drawback is that compaction only happens either when the queue is drained or when method `compact` is explicitly called.
 So, with some peculiar usage patterns, for example, a sequence like "push 100 elements, pop 99 elements, repeat ..." will cause trouble.
-But honestly, in most of cases, there is no reason to have left-over elements in a queue.
-The reason you push some objects into q queue is usually because you need to process them all later.
-Even if you have good reasons to have left-over elements in the queue, you can always call `compact` when you see that the queue has become too sparse.
+If this happens, you can always call `compact` when you see that the queue has become too sparse.
+For example, you can add a `push_might_compact` method to the class, which, before pushing the element,
+first checks whether `size()/head_ < 1/4` and triggers compact if so.
+Obviously, compaction has real cost.
+There is no free-lunch in data structures, but this design at least exposes many knobs for you to tune performance.
+So, I won't say that this design is good for all workloads and usage patterns.
+Recall that you should consider circular buffers and `std::list` first.
 
 `std::optional` is optional for nullable types and trivially destructible types.
 - For a nullable type `T`, `std::vector<T>` can be used. When `pop` is called, the element is set to the null value of `T` followed by `head_` increased.
 - For a trivially destructible type `T`, `std::vector` can be used with `pop` being just increase `head_`.
 
 With two vectors arranged head-to-head, `deque` can also be implemented with the same idea.
-Code is omitted here. I don't want to make this post unnecessarily.
+Code is omitted here. I don't want to make this post unnecessarily long.
 
-To sum up, When you can easily come up with better alternatives, it might be a strong indicator that `std::deque` and `std::queue` are not well designed.
-
+To sum up, When you can easily come up with better alternatives,
+it might be a strong indicator that `std::deque` and `std::queue` are not well designed.

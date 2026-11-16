@@ -151,7 +151,7 @@ Actually, if you know your data size, you should consider a ring buffer (also ca
 Modern implementations of ring buffers often support capacity grow. It is only that users need to explicitly trigger reallocation.
 For example, you can use `set_capacity` to grow capacity of a `boost::circular_buffer`.
 If you need to push one million double numbers into a `boost::circular_buffer`, you can set its capacity to be big enough to hold
-all of them. This will trigger a one-time memory allocation. While with `std::deque`, it will trigger at least ` 1 million / 64 = 15625` memory allocations.
+all of them. This will trigger a one-time memory allocation. While with `std::deque`, it will trigger at least `1 million / 64 = 15625` memory allocations.
 `std::deque` does not expose a `reserve` API to users. Even if you know in advance how many elements you are going to push into a queue,
 there is no way you can let `std::deque` to preserve memory and stop eager deallocation.
 And when you pop out all the one million elements, `std::deque` will trigger at least `15625 - 1` (minus 1 for the keeping one chunk alive trick)
@@ -189,7 +189,7 @@ class queue {
 public:
 template<typename... Args>
 void emplace(Args&&... args) {
-	data_.emplace_back(std::in_place, std::forward<Args>(args)...)
+	data_.emplace_back(std::in_place, std::forward<Args>(args)...);
 }
 
 void push(const T& value)
@@ -233,7 +233,7 @@ private:
 
 With this design, the queue has the following properties trivially:
 1. All elements reside in a contiguous range of memory. It has good cache locality and fast iteration.
-2. It is random accessible just like `std::queue` but the iterator is lighter (because it is essentially just a pointer).
+2. It is random accessible but the iterator is lighter (because it is essentially just a pointer).
 3. Pushing elements might trigger reallocation and invalidate iterators just as `std::queue`,
    but the cost of memory allocation of pushing n element is O(log(n)) contrasting to O(n) of `std::queue`.
    Because the capacity of `std::vector` grow geometrically while that of `std::queue` grows linearly.
@@ -246,15 +246,35 @@ The only drawback is that compaction only happens either when the queue is drain
 So, with some peculiar usage patterns, for example, a sequence like "push 100 elements, pop 99 elements, repeat ..." will cause trouble.
 If this happens, you can always call `compact` when you see that the queue has become too sparse.
 For example, you can add a `push_might_compact` method to the class, which, before pushing the element,
-first checks whether `size()/head_ < 1/4` and triggers compact if so.
-Obviously, compaction has real cost.
-There is no free-lunch in data structures, but this design at least exposes many knobs for you to tune performance.
-So, I won't say that this design is good for all workloads and usage patterns.
-Recall that you should consider circular buffers and `std::list` first.
+first checks whether `head_ - size() > 64 && size()/head_ < 1/4` and triggers compaction if so.
+Obviously, compaction has real cost. If there is `k` elements in the queue when compaction happens, the cost is `O(k)`.
+The overall amortized cost depends on how often compaction happens. There is a short illustrative analysis in the paragraph below next paragraph
+to show that is not as expensive as first glance.
 
 `std::optional` is optional for nullable types and trivially destructible types.
 - For a nullable type `T`, `std::vector<T>` can be used. When `pop` is called, the element is set to the null value of `T` followed by `head_` increased.
 - For a trivially destructible type `T`, `std::vector` can be used with `pop` being just increase `head_`.
+
+Let us use a queue of `double` as an example.
+As stated above, the wrapped vector can be simplified to `std::vector<double>` as `double` is trivially destructible.
+Now we construct a pathological operation sequence for the queue to intentionally trigger periodic compaction.
+```txt
+Init 1: push 80 elements;
+Init 2: pop 65 elements;
+Step 1: push 65 elements; // compaction triggered
+Step 2: pop 65 elements;
+Repeating Step 1-2
+```
+For operation sequence as such, there is one compaction happens at each push-pop cycle.
+The compaction operation will be compiled to a `memcpy` of 15 `double`s, that is a copy of `120` bytes.
+On modern hardware, `memcpy` of such as a size roughly costs `5-20ns`.
+If we apply the same operation sequence to `std::queue`, each cycle will trigger one allocation and one deallocation of `512` bytes (assuming GCC).
+Allocating a `512` bytes in heap typically cast `50-200ns`, and deallocating the same chunk costs about the same.
+That is `100-400ns` overhead for each cycle for `std::queue`.
+Numbers here are only estimation, as actual `memcpy` and memory allocation/deallocation cost varies depending on many factors.
+But their relative magnitude is clear, `memcpy` being much faster than an allocation and deallocation pair.
+This example uses only a small queue size. When queue size grows, performance difference will become bigger.
+The conclusion is: yes, our queue design is no free lunch, but it is also faster than `std::queue` in general.
 
 With two vectors arranged head-to-head, `deque` can also be implemented with the same idea.
 Code is omitted here. I don't want to make this post unnecessarily long.

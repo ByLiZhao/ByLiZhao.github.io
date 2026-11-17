@@ -246,7 +246,7 @@ The only drawback is that compaction only happens either when the queue is drain
 So, with some peculiar usage patterns, for example, a sequence like "push 100 elements, pop 99 elements, repeat ..." will cause trouble.
 If this happens, you can always call `compact` when you see that the queue has become too sparse.
 For example, you can add a `push_might_compact` method to the class, which, before pushing the element,
-first checks whether `head_  > 64 && size()/head_ < 1/4` and triggers compaction if so.
+first checks whether `head_  > 64 && size()/data_.size() < 1/4` and triggers compaction if so.
 Obviously, compaction has real cost. If there is `k` elements in the queue when compaction happens, the cost is `O(k)`.
 The overall amortized cost depends on how often compaction happens. There is a short illustrative analysis in the paragraph below next paragraph
 to show that is not as expensive as first glance.
@@ -259,6 +259,7 @@ Let us use a queue of `double` as an example.
 As stated above, the wrapped vector can be simplified to `std::vector<double>` as `double` is trivially destructible.
 Now we construct a pathological operation sequence for the queue to intentionally trigger periodic compaction.
 ```txt
+// when push, use the push_might_compact method
 Init 1: push 80 elements;
 Init 2: pop 65 elements;
 Step 1: push 65 elements; // compaction triggered
@@ -267,14 +268,30 @@ Repeating Step 1-2
 ```
 For operation sequence as such, there is one compaction happens at each push-pop cycle.
 The compaction operation will be compiled to a `memcpy` of 15 `double`s, that is a copy of `120` bytes.
-On modern hardware, `memcpy` of such as a size roughly costs `5-20ns`.
-If we apply the same operation sequence to `std::queue`, each cycle will trigger one allocation and one deallocation of `512` bytes (assuming GCC).
-Allocating a `512` bytes in heap typically cast `50-200ns`, and deallocating the same chunk costs about the same.
-That is `100-400ns` overhead for each cycle for `std::queue`.
-Numbers here are only estimation, as actual `memcpy` and memory allocation/deallocation cost varies depending on many factors.
-But their relative magnitude is clear, `memcpy` being much faster than an allocation and deallocation pair.
-This example uses only a small queue size. When queue size grows, performance difference will become bigger.
-The conclusion is: yes, our queue design is no free lunch, but it is also faster than `std::queue` in general.
+On modern hardware, `memcpy` of such a size roughly costs `5-20ns`.
+That is roughly `0.08-0.27ns` per element in average.
+So, the cost is real, but the amortized cost is also quite insignificant.
+When queue size grows, the latency spike caused by compaction will increase tail latency,
+but average latency will only be slightly higher with pathological usage pattern.
+This special operation sequence is comfort zone for `std::deque` because of the "keeping one backup chunk" optimization trick.
+After allocating two chunks of `512` bytes, assuming we are using GCC, `std::queue` will recycle the one chunk released in Step 2.
+From the point of memory allocation, this operation sequence happen to be optimal to `std::queue`.
+But even with this operation sequence, `std::queue` generally won't be faster, or only faster in jitter noise range depending on your setting-up,
+as it has slower iterators in the sense of median or average latency, though it will have better tail latency.
+But to be honest, for bounded queue size like this, a ring buffer will be the fastest.
+If we use the following operation sequence by multiplying operation size of the above example by `10`,
+while the amortized cost of compaction is still the same for our queue, the cost of repeating memory allocation and deallocation will kick in for `std::queue`.
+Even with the "keeping one backup chunk trick", `11` chunks of `512` bytes will be allocated and deallocated per cycle.
+This will roughly cost `400-4000ns` in total, while `memcpy` of `160` double's will roughly cost `20-400ns`.
+```txt
+// when push, use the push_might_compact method
+Init 1: push 800 elements;
+Init 2: pop 650 elements;
+Step 1: push 650 elements; // compaction triggered
+Step 2: pop 650 elements;
+Repeating Step 1-2
+```
+We can see that as data size grows, the downside of `std::queue` becomes more apparent.
 
 With two vectors arranged head-to-head, `deque` can also be implemented with the same idea.
 Code is omitted here. I don't want to make this post unnecessarily long.

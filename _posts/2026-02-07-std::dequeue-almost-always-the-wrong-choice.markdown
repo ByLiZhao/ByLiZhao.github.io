@@ -324,3 +324,10 @@ Thus an iterator of index `n` points to the element at slot `head_ + (n - pop_in
 With this definition, iterators are stable under all queue operations.
 Iterators of this type also have the advantage that you can check whether the pointed-to element has been popped out,
 by comparing them with `begin()` and `end()`.
+
+Of course, iterator stability is not the same as reference stability.
+But, in code where you store a reference or pointer, you can always store a iterator instead.
+When you hold a reference or pointer, you have to pay extra attention to make sure that the referenced object has not been popped out,
+otherwise, you will have a use-after-free bug.
+When you hold an iterator, you can check whether the iterator is still valid.
+There is one caveat though, iterators will be invalidated if the queue is moved.

@@ -331,3 +331,8 @@ When you hold a reference or pointer, you have to pay extra attention to make su
 otherwise, you will have a use-after-free bug.
 When you hold an iterator, you can check whether the iterator is still valid.
 There is one caveat though, iterators will be invalidated if the queue is moved.
+
+Another drawback of our queue is that it does work with non-movable types like `std::mutex`.
+But, honestly, when is the last time you have to push and pop a large number of `std::mutex` objects.
+There are not many non-movable types in real world programming.
+When you do need to deal with them with a queue in some rare cases, consider fixed-size circular buffers or `std::list`.

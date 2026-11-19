@@ -293,6 +293,29 @@ Repeating Step 1-2
 ```
 We can see that as data size grows, the downside of `std::queue` becomes more apparent.
 The key insight here is that repetitive memory relocating is faster repetitive memory allocation/deallocation.
+Moreover, the above is worst-case analysis. With many usage pattern and work loads,
+compaction either never happens or happens only rarely.
+
+But, doesn't an auto-growing curcular buffer have all the benefits stated above without the trouble of compaction?
+Yes and No. Obviously, auto-growing circular buffers can be better for some usage patterns.
+But this design has different spatial cache locality characteristics while both can handle unbounded input bursts.
+Say, after an input burst, the size of a ring buffer is enlarged to 1 million, system enters small-volume mode,
+with a pattern that is roughly as below:
+```txt
+push 100
+pop 100
+push 10
+pop 10
+push 23
+pop 23
+```
+That is, small active data set in a large queue. Due to the nature of ring buffers,
+the sliding window consisting of active data moves over the underlying array from begin to end until wrap-up and repeat.
+Since the queue size is large, it keeps invalidating L1/L2 cache lines.
+This is something that does not show with big O notation of algorithm analysis.
+While our queue, with seemingly unnecessary compaction sometimes, tries to keep active data near front of the underlying array.
+With the operation sequence above, our queue only access a small portion the buffer at its begining.
+This is much faster because cache line is hot.
 
 With two vectors arranged head-to-head, `deque` can also be implemented with the same idea.
 Code is omitted here. I don't want to make this post unnecessarily long.

@@ -246,7 +246,7 @@ The only drawback is that compaction only happens either when the queue is drain
 So, with some peculiar usage patterns, for example, a sequence like "push 100 elements, pop 99 elements, repeat ..." will cause trouble.
 If this happens, you can always call `compact` when you see that the queue has become too sparse.
 For example, you can add a `push_might_compact` method to the class, which, before pushing the element,
-first checks whether `head_  > 64 && size()/data_.size() < 1/4` and triggers compaction if so.
+first checks whether `head_  > 64 && size() * 4 < data_.size()` and triggers compaction if so.
 Obviously, compaction has real cost. If there is `k` elements in the queue when compaction happens, the cost is `O(k)`.
 The overall amortized cost depends on how often compaction happens. There is a short illustrative analysis in the paragraph below next paragraph
 to show that is not as expensive as first glance.

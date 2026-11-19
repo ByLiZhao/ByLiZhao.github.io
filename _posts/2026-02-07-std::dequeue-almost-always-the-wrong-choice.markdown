@@ -292,9 +292,35 @@ Step 2: pop 650 elements;
 Repeating Step 1-2
 ```
 We can see that as data size grows, the downside of `std::queue` becomes more apparent.
+The key insight here is that repetitive memory relocating is faster repetitive memory allocation/deallocation.
 
 With two vectors arranged head-to-head, `deque` can also be implemented with the same idea.
 Code is omitted here. I don't want to make this post unnecessarily long.
 
 To sum up, When you can easily come up with better alternatives,
 it might be a strong indicator that `std::deque` and `std::queue` are not well designed.
+
+## But isn't reference stability of `std::deque` still something unique?
+Someone might say that there is something unique to `std::queue` that has been neglected by us by now, that is, reference stability.
+Reference stability means that once you get a reference or a pointer to an element in `std::queue`, it will remain valid during the
+lifetime of the queue, as long as the referenced element is not popped out.
+Can this be a valid reason that `std::deque` should be preferred in some cases?
+
+But, with a small trick, the iterator of our queue proposed in last section can be made stable.
+If, instead of reusing the iterator of `std::vector`, we define the iterator of the queue as
+a pair of pointer and index, where the pointer pointing to `data_` and the index being `n`,
+meaning the `n-th` element that has been pushed since queue creation, like below:
+```cpp
+class iterator{
+	decltype(data_) * ptr = &data_;
+	std::size_t n; // the n-th element pushed into queue ever
+};
+```
+We also need to maintain a `std::size_t push_index` and a `std::size_t pop_index` inside the queue.
+Whenever an element is pushed into the queue, `push_index` is increased by `1`,
+and `pop_index` increased by `1` when an element is popped out.
+The relation of `size() == push_indx - pop_index` is always true.
+Thus an iterator of index `n` points to the element at slot `head_ + (n - pop_index)`.
+With this definition, iterators are stable under all queue operations.
+Iterators of this type also have the advantage that you can check whether the pointed-to element has been popped out,
+by comparing them with `begin()` and `end()`.

@@ -69,7 +69,15 @@ But this does mean that the probability that an evicted order being also open or
 Say, that a randomly chosen order has a probability of `10%` to be open ( a generous estimation to compensate local clustering),
 the evicted order has a probability of $0.0015 \times 0.1 < 0.0002$ to be pushed to the backup table, that is 2 in every 10 thousand orders.
 
-With this simple design, for almost all newly inserted orders, searching is just calculating hash value and jumping to its perfect-hashing slot.
+When eviction to the backup table happens, tail latency spikes.
+If this is an issue, or you really want to squeeze the absolute last drop of performance from it,
+use a small open-addressing hash table with Robin Hood as the backup table,
+and you can reuse the hash value of the key.
+Since not so many elements are in the backup table, and Robin Hood hashing has good upper complexity bound,
+in worst case, looking-up latency will be `Latency of the main table + latency of the backup table`.
+Tail latency will be slightly larger than when using a single Robin Hood hashing scheme,
+but median or average latency will be better.
+The reason is that, for almost all newly inserted orders, searching is just calculating hash value and jumping to its perfect-hashing slot.
 The performance is near that of a globally perfect-hashing hashtable. For a small fraction of queries, an extra linear probing of fix-sized range
 is needed. Only when you are really unlucky, 2 hashtable looking up will be needed. The pattern is well-suited for branch predictors of modern CPU's.
 After several times of warm-up looking-up, it will predict with high certainty about which branch to take.

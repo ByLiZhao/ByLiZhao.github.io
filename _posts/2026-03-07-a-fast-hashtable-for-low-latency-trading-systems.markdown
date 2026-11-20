@@ -50,11 +50,24 @@ You can use `std::unordered_map` for that purpose.
 
 To control the probability that a pair is evicted to the backup table, the load factor of the main table should be controlled.
 A simple choice is `2/3 ≈ 0.66`. Whenever the load factor of the main table exceeds `0.66`, the underlying array grows by a factor of `1.5`.
+If you want to avoid the cost of memory allocation and rehashing in the middle of a trading day, you can of course call `reserve` and starts
+with a large underlying array size. This will only make performance better.
+
 Assuming the hash function used is good enough to roughly distribute elements evenly onto the underlying array.
 When load factor is `0.66`, The probability that an evicted pair can't find a lost in `16` slots is about $ 0.66^{16} \approx 0.0015 $.
-The probability that this order is also an open order is even lower, as open orders at any moment in the system except at market open is only a small fraction
-of all the orders. Say, less than 10 percent of all the orders on Order Book are open orders, the probability that an open order
-is evicted to the backup table is $0.0015 \times 0.1 < 0.0002$, that is 2 in every 10 thousand orders.
+This formula assumes independent uniform probabilities.
+But in reality, hash functions are usually not that good.
+Crowded clustering happens more often than this estimation.
+The actual number depends on the hash function used and also the load factor.
+It is important to choose a high quality and fast hash function for good performance.
+There are quite some open-sourced choices available online.
+A good hash function has the so-called avalanche effect, meaning a small change of input can cause a big change of output.
+In practice, this means if you insert `n` new orders consecutively into Order Book,
+the probability that they cluster together is very low.
+Note that this is not to say an newly inserted element won't be clustering with existing elements.
+But this does mean that the probability that an evicted order being also open order is low,
+Say, that a randomly chosen order has a probability of `10%` to be open ( a generous estimation to compensate local clustering),
+the evicted order has a probability of $0.0015 \times 0.1 < 0.0002$ to be pushed to the backup table, that is 2 in every 10 thousand orders.
 
 With this simple design, for almost all newly inserted orders, searching is just calculating hash value and jumping to its perfect-hashing slot.
 The performance is near that of a globally perfect-hashing hashtable. For a small fraction of queries, an extra linear probing of fix-sized range

@@ -168,12 +168,13 @@ For simple cases:
   If even `std::pmr::list` not fast enough for you, consider using custom allocators with `std::list`.
   Performance-wise, the biggest concern for `std::list` is
   usually poor cache locality and repetitive memory allocation/deallocation. Custom allocators can greatly reduce the cost.
-  Yes, even with custom allocators, `std::list` would usually still be slower when elements are processed sequentially because of point chasing,
+  Yes, even with custom allocators, `std::list` would usually still be slower when elements are processed sequentially because of pointer chasing,
   but the performance difference can be within a small margin.
-  Having large queues is usually a strong indicator that you might need to perform some kind of filters on queue elements in future.
-  `std::list`'s ability to insert and erase elements in the middle of queue would become handy in this situation.
-  So, the argument here is not "use `std::list` because it is faster than `std::deque`, but "consider `std::list` because
-  its performance is not as bad as you might think while it enables more flexible design and logic".
+  The argument here is not you should use `std::list` because it is faster than `std::deque`,
+  but that if you can afford a bit worse performance, and stable iterator/pointer/reference of `std::list` is valuable for your use case,
+  consider `std::list`",
+  for its performance is not as bad as you might think while it enables more flexible design.
+  Not every piece of code is super performance critical.
 
 ## Go one step further
 If you application is really performance critical, and circular buffers are too restrictive and `std::list` is too slow even with custom allocators,

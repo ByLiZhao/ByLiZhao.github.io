@@ -127,7 +127,13 @@ public:
     }
 
 	constexpr explicit operator bool() const noexcept{
-		return !input_.empty();
+		if(input_.empty()){
+			return false;
+		}
+		else{
+			auto first = input_.find_first_not_of(delim_);
+			return first != npos;
+		}
 	}
 };
 

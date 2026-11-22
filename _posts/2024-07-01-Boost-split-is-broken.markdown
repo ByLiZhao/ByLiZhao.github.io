@@ -132,7 +132,7 @@ public:
 		}
 		else{
 			auto first = input_.find_first_not_of(delim_);
-			return first != npos;
+			return first != std::strng_view::npos;
 		}
 	}
 };
@@ -194,3 +194,25 @@ For simple tasks, it is two heavy-weight.
 For complex tasks, you would be better off with having a real parser.
 If your splitting logic is no unique, it is clearer to write it in parsing rules.
 Modern parser combinator can generate the actual code for you.
+
+# How do other programming languages do it regarding Null-to-Null correspondence
+1. Ruby, `"".split(",")` and `"".split(",", -1)` both returns an empty `[]`, that is an empty array in Ruby.
+   Null-to-Null correspondence is respected.
+2. Python is very confusing here, `"".split()` returns an empty list, but `"".split(",")` returns a list that contains one empty token.
+   The motto of Python is "There is only one way to do it", but there are probably two ways to be surprised here.
+   When you use `split()` without specifying a separator, Python uses its default "whitespace characters" as delimiters,
+   that is, space, horizontal tab and vertical tab, line feed and carriage return, and the less known "form feed", the `"\f"` character.
+   The behavior of `split()` is sort of like `token_compress_on` in `boost::split` but only for these whitespace characters.
+   This explains why `"".split()` returns `[]`, but also makes you wonder why this behavior is not available for other separators.
+   The `token_compress_on` behavior should be orthogonal to the choice of separators.
+3. Java, splitting an empty string returns an array that contains an empty token, same as `boost::split` in this regard.
+5. JavaScript, is as inconsistent as Python, `"".split("")` returns `[]`, while `"".split(",")` returns `[""]`.
+   It is worth noticing that when the separator is an empty string, JS splits the input string into array of UTF-16 code units,
+   for example, `"abc".split("")` returns `["a", "b", "c"]`. This is different from Python.
+4. Rust, splitting an empty string returns an iterator, when being consumed, it is equivalent to one empty token.
+   Rust also has an `split_whitespace`, that is every similar to Python's `split()`.
+   This is less confusing than Python, because `split_whitespace` is a different function with a different name.
+   But again, while it avoid the obvious confusion of Python's `split` function,
+   it does not fix the deeper design issue, that is, two things that should be orthogonal are hard-coded together.
+
+

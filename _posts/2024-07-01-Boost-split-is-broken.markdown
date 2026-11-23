@@ -17,12 +17,19 @@ With the following code, the result vector is not empty but contains an empty st
 	assert(result.size() == 1u);
 ```
 This is really bad because it violates the Null-to-Null correspondence, which is
-a term coined by me to express the idea that for algorithms like `split`, the expected
-behavior by most programmers, I believe, should always be mapping an empty string to an empty set.
+a term coined by me to express the idea that for algorithms like `split`, the correct
+behavior, I believe, should always be mapping an empty string to an empty set.
 Splitting nothing is intuitively a Non-op, resulting nothing, an empty vector in this case.
-Ironically, the boost documentation falsely claims that "This function is equivalent to C strtok",
-but `strtok` does not have this problem.
+Some would argue that splitting an empty string yielding an empty token actually makes sense,
+becuase if you apply `join` to it, you get back the empty input string.
+The thing is, you don't have to be a set theorist to know that the empty set is different than the set that contains the empty set as its only member.
+In the same way, a `std::vector<std::string>` that contains an empty string is not the same as an empty `std::vector`,
+even though when you apply `join` you will get the same result.
+Being coincidentally consistently is not the same as being logical.
+Sure, it is a small thing, though I think it is a point worth making.
 
+The documentation of `boost::split` falsely claims that "This function is equivalent to C strtok",
+but `strtok` does not have this problem.
 If one looks more closely, `boost::split` is actually broken in more than one way.
 1. First, it potentially triggers a lot of memory allocations.
 If a `vector<string>` is used as the output parameter as the example in the beginning,
@@ -107,33 +114,30 @@ class tokenizer {
 public:
     constexpr tokenizer(std::string_view input,
               std::string_view delim) noexcept
-        : input_(input), delim_(delim) {}
+        : input_(input), delim_(delim) {
+		constexpr auto npos = std::string_view::npos;
+
+        auto first = input_.find_first_not_of(delim_);
+        input_.remove_prefix(first == npos? input_.size() : first);
+		}
 
 	// return empty string means no more token
     constexpr std::string_view operator()() noexcept
     {
 		constexpr auto npos = std::string_view::npos;
 
-        // skip leading delimiters.
-        auto first = input_.find_first_not_of(delim_);
-		// update input to exclude leading delimiters
-        input_.remove_prefix(first == npos? input_.size() : first);
-
         auto last = input_.find_first_of(delim_);
         auto token = input_.substr(0, last); // substr handles last == npos
         input_.remove_prefix(token.size());
+
+        auto first = input_.find_first_not_of(delim_);
+        input_.remove_prefix(first == npos? input_.size() : first);
 
         return token;
     }
 
 	constexpr explicit operator bool() const noexcept{
-		if(input_.empty()){
-			return false;
-		}
-		else{
-			auto first = input_.find_first_not_of(delim_);
-			return first != std::strng_view::npos;
-		}
+		return !input_.empty();
 	}
 };
 

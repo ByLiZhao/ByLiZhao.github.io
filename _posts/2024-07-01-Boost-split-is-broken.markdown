@@ -21,12 +21,22 @@ a term coined by me to express the idea that for algorithms like `split`, the co
 behavior, I believe, should always be mapping an empty string to an empty set.
 Splitting nothing is intuitively a Non-op, resulting nothing, an empty vector in this case.
 Some would argue that splitting an empty string yielding an empty token actually makes sense,
-becuase if you apply `join` to it, you get back the empty input string.
+because if you apply `join` to it, you get back the empty input string.
 The thing is, you don't have to be a set theorist to know that the empty set is different than the set that contains the empty set as its only member.
-In the same way, a `std::vector<std::string>` that contains an empty string is not the same as an empty `std::vector`,
-even though when you apply `join` you will get the same result.
-Being coincidentally consistently is not the same as being logical.
-Sure, it is a small thing, though I think it is a point worth making.
+In the same way, a `std::vector<std::string>` that contains an empty string is not the same as an empty `std::vector`.
+Being coincidentally consistent is not the same as being logical.
+Note, that I am not implying there is something wrong if you split string `","` to `2` empty tokens,
+( with separator `","` without `token_compress_on`).
+When the input string is not empty, and there are `n` separators in it, there should always be `n + 1` tokens without `token_compress_on`.
+This is as true as a mathematical fact.
+When parsing csv files, an input string like `",,,"` should be parsed into `4` empty tokens,
+for the presence of `4` separators explicitly marks that `4` values are missing here.
+Empty tokens stand for `nil` values in this context, which I am totally fine with.
+However, the fact that with `token_compress_on`, splitting an empty string resulting in an empty vector is just another example of
+coincidental consistency. It can even be  subtlety inconsistent in some cases.
+Using csv parsing as an example again, if empty tokens stand for `nil` values in a csv table,
+what does it mean if you get an empty token out of an empty line?
+Sure, this is a small thing, though I think it is a point worth making.
 
 The documentation of `boost::split` falsely claims that "This function is equivalent to C strtok",
 but `strtok` does not have this problem.

@@ -1,5 +1,3 @@
----
-layout: post
 mathjax: true
 comments: true
 title:  "Boost::split is broken"
@@ -12,34 +10,42 @@ Several days ago, I was bitten by this weird behavior of `boost::split`: if the
 input string is empty, it puts an empty string into the output vector.
 With the following code, the result vector is not empty but contains an empty string.
 ```cpp
-    std::vector<std::string> result;
-    boost::split(result, "", boost::is_any_of(","), boost::algorithm::token_compress_on);
+	std::vector<std::string> result;
+	boost::split(result, "", boost::is_any_of(","), boost::algorithm::token_compress_on);
 	assert(result.size() == 1u);
 ```
 This is really bad because it violates the Null-to-Null correspondence, which is
 a term coined by me to express the idea that for algorithms like `split`, the correct
 behavior, I believe, should always be mapping an empty string to an empty set.
 Splitting nothing is intuitively a Non-op, resulting nothing, an empty vector in this case.
+
 Some would argue that splitting an empty string yielding an empty token actually makes sense,
+for example `"".split(",")` in Python returns `[""]`,
 because if you apply `join` to it, you get back the empty input string.
 The thing is, you don't have to be a set theorist to know that the empty set is different than the set that contains the empty set as its only member.
 In the same way, a `std::vector<std::string>` that contains an empty string is not the same as an empty `std::vector`.
 Being coincidentally consistent is not the same as being logical.
-Note, that I am not implying there is something wrong if you split string `","` to `2` empty tokens,
-( with separator `","` without `token_compress_on`).
+
+Note, that I am not saying that there is something wrong with empty tokens.
+If you split string `","` to `2` empty tokens,
+( with separator `","` without `token_compress_on`), you get `2` tokens from `1` separator.
 When the input string is not empty, and there are `n` separators in it, there should always be `n + 1` tokens without `token_compress_on`.
 This is as true as a mathematical fact.
 When parsing csv files, an input string like `",,,"` should be parsed into `4` empty tokens,
 for the presence of `4` separators explicitly marks that `4` values are missing here.
-Empty tokens stand for `nil` values in this context, which I am totally fine with.
-However, the fact that with `token_compress_on`, splitting an empty string resulting in an empty vector is just another example of
-coincidental consistency. It can even be  subtlety inconsistent in some cases.
-Using csv parsing as an example again, if empty tokens stand for `nil` values in a csv table,
-what does it mean if you get an empty token out of an empty line?
-Sure, this is a small thing, though I think it is a point worth making.
+Empty tokens stand for `nil` values in this context.
 
+The problem with `boost::split` is that
+1. Even with `token_compress_on`, the output vector is not empty with an empty string input.
+   This makes you wonder, why  `token_compress_on` does not filter out the empty token in this case.
+2. When used without `token_compress_on`, using csv parsing as example again.
+   If empty tokens stand for `nil` values in a csv table,
+   what does it mean if you get an empty token out of an empty line?
+
+So, `boost::split` is not even coincidentally consistent here, but subtly inconsistent.
 The documentation of `boost::split` falsely claims that "This function is equivalent to C strtok",
 but `strtok` does not have this problem.
+
 If one looks more closely, `boost::split` is actually broken in more than one way.
 1. First, it potentially triggers a lot of memory allocations.
 If a `vector<string>` is used as the output parameter as the example in the beginning,

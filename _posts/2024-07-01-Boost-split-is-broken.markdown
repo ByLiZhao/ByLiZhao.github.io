@@ -32,7 +32,7 @@ If you split string `","` to `2` empty tokens,
 When the input string is not empty, and there are `n` separators in it, there should always be `n + 1` tokens without `token_compress_on`.
 This is as true as a mathematical fact.
 When parsing csv files, an input string like `",,,"` should be parsed into `4` empty tokens,
-for the presence of `4` separators explicitly marks that `4` values are missing here.
+for the presence of `3` separators explicitly marks that `4` values are missing here.
 Empty tokens stand for `nil` values in this context.
 
 The problem with `boost::split` is that
@@ -110,7 +110,7 @@ struct tok_state{
 struct token{
 	const char * str;
 	const size_t size;
-}
+};
 
 // new strtok signature
 struct token strtok(struct tok_state*);
@@ -186,7 +186,7 @@ int main()
 Moreover, empty ranges are part of its semantic contract, which means:
 - split an empty string yields one empty token.
 - split `","` with delimiter `","`, produces 2 empty tokens.
-- split `"a,,b"` with delimiter `","` produces `"a", "", "", "b"`.
+- split `"a,,,b"` with delimiter `","` produces `"a", "", "", "b"`.
 The contract is that if you join tokens together with the same delimiter, you will get the original view.
 Though returning one empty token on empty input is still a design quirk,
 with `std::ranges`'s fluent API, you can easily filter empty results out if you want like
@@ -199,7 +199,7 @@ auto tokens =
           return !std::ranges::empty(r);
       });
 for(auto sub_range : tokens){
-	std::string_vew sv{sub_range}; // only for C++23
+	std::string_view sv{sub_range}; // only for C++23
 }
 ```
 {% endraw %}

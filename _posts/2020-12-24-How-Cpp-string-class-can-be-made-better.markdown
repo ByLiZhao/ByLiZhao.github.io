@@ -24,7 +24,7 @@ As C++ is a performance oriented language, and is already rich in performance-aw
 language features, if an idea can potentially optimize C++, it might bears some weight.
 Here we go.
 
-# Extend the concept of string iterals
+# Extend the concept of string literals
 First, let us start with string literals.
 A string literal is a string of face value which is fully determined at compile-time.
 C already had this in the beginning.
@@ -109,12 +109,12 @@ Assuming we have this special C++ rule (note this is not standard C++):
 // For a string s, "const s" means constness propagates to its data
 // as if the class is defined as below:
 class string{
-	[[propogate_const]]
+	[[propagate_const]]
 	char * data;
 	std::size_t size;
 };
 ```
-The hypothetical `propogate_const` attribute means top level constness will be
+The hypothetical `propagate_const` attribute means top level constness will be
 applied to the member `data` too.
 
 With this, we can strictly define the `value type` of `std::map<std::string, std::string>`
@@ -154,7 +154,7 @@ So, instead of switching to a new string type, stack allocation should be done i
 std::string [[stack_alloc]] s = "This is a string that is too big for Small String Optimization, but not too big for stack allocation";
 func(s); // func takes const std::string&
 ```
-The type of `s` is still `std::string`. Anyone except the one who wrote this peace of code, does not need to know that this string is stack allocated.
+The type of `s` is still `std::string`. Anyone except the one who wrote this piece of code, does not need to know that this string is stack allocated.
 The signature of subsequent functions don't have to change. Actually, they don't bother to know where the string is allocated.
 The implementation should set an upper limit on how much you can allocate on stack for an object.
 For strings, we can start small, say, the default maximal size for stack allocated strings is set to 128 bytes.
